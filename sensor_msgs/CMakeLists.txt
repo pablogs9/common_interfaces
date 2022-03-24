@@ -73,6 +73,12 @@ if(TARGET ${cpp_target})
   install(
     TARGETS ${PROJECT_NAME}_library EXPORT export_${PROJECT_NAME}
   )
+
+  # Export old-style CMake variables
+  ament_export_include_directories("include/${PROJECT_NAME}")
+
+  # Export modern CMake targets
+  ament_export_targets(export_${PROJECT_NAME})
 endif()
 
 if(BUILD_TESTING)
@@ -88,12 +94,6 @@ if(BUILD_TESTING)
   rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
   target_link_libraries(test_sensor_msgs "${cpp_typesupport_target}")
 endif()
-
-# Export old-style CMake variables
-ament_export_include_directories("include/${PROJECT_NAME}")
-
-# Export modern CMake targets
-ament_export_targets(export_${PROJECT_NAME})
 
 ament_export_dependencies(rosidl_default_runtime)
 
