@@ -55,17 +55,15 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ADD_LINTER_TESTS
 )
 
-set(cpp_target
-  "${PROJECT_NAME}__rosidl_generator_cpp"
-)
+rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
 
-if(TARGET ${cpp_target})
+if(cpp_typesupport_target)
   add_library(${PROJECT_NAME}_library INTERFACE)
   target_include_directories(${PROJECT_NAME}_library INTERFACE
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
   target_link_libraries(${PROJECT_NAME}_library INTERFACE
-  "${cpp_target}")
+  "${cpp_typesupport_target}")
 
   install(DIRECTORY include/
     DESTINATION include/${PROJECT_NAME}
@@ -79,20 +77,20 @@ if(TARGET ${cpp_target})
 
   # Export modern CMake targets
   ament_export_targets(export_${PROJECT_NAME})
+
+  if(BUILD_TESTING)
+    ament_add_gtest(test_sensor_msgs
+      test/test_image_encodings.cpp
+      test/test_pointcloud_conversion.cpp
+      test/test_pointcloud_iterator.cpp)
+    target_link_libraries(test_sensor_msgs ${PROJECT_NAME}_library)
+  endif()
 endif()
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
-
-  include_directories(include)
-  ament_add_gtest(test_sensor_msgs
-    test/test_image_encodings.cpp
-    test/test_pointcloud_conversion.cpp
-    test/test_pointcloud_iterator.cpp)
-  rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
-  target_link_libraries(test_sensor_msgs "${cpp_typesupport_target}")
 endif()
 
 ament_export_dependencies(rosidl_default_runtime)
