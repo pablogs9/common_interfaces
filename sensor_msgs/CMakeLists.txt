@@ -55,21 +55,25 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ADD_LINTER_TESTS
 )
 
-rosidl_get_typesupport_target(cpp_target "${PROJECT_NAME}" "rosidl_generator_cpp")
+set(cpp_target
+  "${PROJECT_NAME}__rosidl_generator_cpp"
+)
 
-add_library(${PROJECT_NAME}_library INTERFACE)
-target_include_directories(${PROJECT_NAME}_library INTERFACE
+if(TARGET ${cpp_target})
+  add_library(${PROJECT_NAME}_library INTERFACE)
+  target_include_directories(${PROJECT_NAME}_library INTERFACE
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
-target_link_libraries(${PROJECT_NAME}_library INTERFACE
+  target_link_libraries(${PROJECT_NAME}_library INTERFACE
   "${cpp_target}")
 
-install(DIRECTORY include/
-  DESTINATION include/${PROJECT_NAME}
-)
-install(
-  TARGETS ${PROJECT_NAME}_library EXPORT export_${PROJECT_NAME}
-)
+  install(DIRECTORY include/
+    DESTINATION include/${PROJECT_NAME}
+  )
+  install(
+    TARGETS ${PROJECT_NAME}_library EXPORT export_${PROJECT_NAME}
+  )
+endif()
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
